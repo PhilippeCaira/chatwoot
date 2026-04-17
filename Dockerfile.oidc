@@ -1,0 +1,11 @@
+# Chatwoot + OIDC via OmniAuth OpenID Connect
+# Utilise l'image officielle et ajoute le gem + l'initializer OIDC
+ARG CHATWOOT_VERSION=v4.12.0
+FROM chatwoot/chatwoot:${CHATWOOT_VERSION} AS chatwoot-oidc
+
+USER root
+RUN cd /app && \
+    echo "gem 'omniauth_openid_connect', '~> 0.8'" >> Gemfile && \
+    bundle install --jobs 4 --no-cache && \
+    rm -rf /usr/local/bundle/cache/*.gem
+COPY config/initializers/omniauth.rb /app/config/initializers/omniauth.rb
