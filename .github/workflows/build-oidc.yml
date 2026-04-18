@@ -40,11 +40,13 @@ jobs:
             echo "::warning::Rebase failed — manual intervention needed"
           fi
 
+      - name: Lowercase image name
+        run: echo "IMAGE_LC=$(echo "$IMAGE" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Detect version
         id: version
         run: |
-          # Version depuis le dernier tag chatwoot
-          VERSION=$(grep 'CHATWOOT_VERSION' config/app.yml 2>/dev/null | grep -oP "'[^']+'" | tr -d "'" || echo "v4.12.0")
+          VERSION=$(grep -oP "version:\s*'\K[^']+" config/app.yml 2>/dev/null || git describe --tags --abbrev=0 2>/dev/null || echo "latest")
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - uses: docker/login-action@v3
@@ -60,5 +62,5 @@ jobs:
           target: chatwoot-oidc
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ steps.version.outputs.version }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_LC }}:${{ steps.version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_LC }}:latest
