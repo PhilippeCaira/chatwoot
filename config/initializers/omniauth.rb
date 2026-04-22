@@ -2,6 +2,12 @@
 # Sets the full host URL for callbacks and proper redirect handling
 OmniAuth.config.full_host = ENV.fetch('FRONTEND_URL', 'http://localhost:3000')
 
+# OmniAuth 2+ default n'accepte que POST pour initier un flow (CSRF protection).
+# On autorise GET aussi pour permettre l'auto-redirect server-side depuis
+# Traefik redirectregex (sans ça, GET /omniauth/oidc → 404).
+OmniAuth.config.allowed_request_methods = [:get, :post]
+OmniAuth.config.silence_get_warning = true
+
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :google_oauth2, ENV.fetch('GOOGLE_OAUTH_CLIENT_ID', nil), ENV.fetch('GOOGLE_OAUTH_CLIENT_SECRET', nil), {
     provider_ignores_state: true
