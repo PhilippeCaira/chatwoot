@@ -10,6 +10,9 @@ permissions:
 
 jobs:
   sync:
+    # Skip sur les forks personnels — secrets Linear (LINEAR_API_KEY, etc.)
+    # appartiennent à l'org chatwoot.
+    if: github.repository_owner != 'PhilippeCaira'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -16,7 +16,8 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_REPO: chatwoot/chatwoot
+  # Adapté pour fork perso : push vers GHCR au lieu de Docker Hub officiel
+  DOCKER_REPO: ghcr.io/philippecaira/chatwoot
 
 permissions:
   contents: read
@@ -62,12 +63,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to DockerHub
+      - name: Login to GHCR
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Build and push by digest
         id: build
@@ -105,11 +107,12 @@ jobs:
           pattern: digests-*
           merge-multiple: true
 
-      - name: Login to DockerHub
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
